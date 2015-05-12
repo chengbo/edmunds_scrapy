@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
+import re
 from edmunds.items import KeyValueItem, EdmundsItem, ColorItem
 
 
@@ -17,6 +18,12 @@ class CarSpider(scrapy.Spider):
         item['specifications'] = self.parseSpecifications(response)
         item['features'] = self.parseFeatures(response)
         item['options'] = self.parseOptions(response)
+
+        make, model, year, style = self.parseInfo(response.url)
+        item['make'] = make
+        item['model'] = model
+        item['year'] = year
+        item['style'] = style
 
         return item
 
@@ -82,7 +89,7 @@ class CarSpider(scrapy.Spider):
         for i in range(0, len(elements)):
             item = KeyValueItem()
             item['key'] = elements[i].xpath('text()').extract()[0]
-            item['value'] = self.parseTable(elements[i].xpath(self.buildXpath('h4', i)))
+            item['value'] = self.parseTable(elements[i].xpath(self.buildXpath('h3', i)))
 
             specs.append(item)
 
@@ -136,3 +143,11 @@ class CarSpider(scrapy.Spider):
     def buildXpath(self, name, i):
         return './following-sibling::table \
                 [1 = count(preceding-sibling::%s[1] | ../%s[%d])]' % (name, name, (i + 1))
+
+    def parseInfo(self, url):
+        searchObj = re.search(r'edmunds\.com/(\w+)/([\w-]+)/(\d+)/st-(\d+)/', url)
+        if searchObj:
+            return searchObj.group(1), searchObj.group(2), \
+                searchObj.group(3), searchObj.group(4)
+
+        return 'UNKNOWN', 'UNKNOWN', 'UNKNOWN', 'UNKNOWN'

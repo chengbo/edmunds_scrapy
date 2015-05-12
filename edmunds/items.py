@@ -11,15 +11,21 @@ import scrapy
 class EdmundsItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
+    make = scrapy.Field()
+    model = scrapy.Field()
+    year = scrapy.Field()
+    style = scrapy.Field()
     highlights = scrapy.Field()
     colors = scrapy.Field()
     specifications = scrapy.Field()
     features = scrapy.Field()
     options = scrapy.Field()
 
+
 class KeyValueItem(scrapy.Item):
     key = scrapy.Field()
     value = scrapy.Field()
+
 
 class ColorItem(scrapy.Item):
     exterior = scrapy.Field()
