@@ -16,21 +16,30 @@ class CarSpider(scrapy.Spider):
         item['colors'] = self.parseColors(response)
         item['specifications'] = self.parseSpecifications(response)
         item['features'] = self.parseFeatures(response)
+        item['options'] = self.parseOptions(response)
 
         return item
 
-    def parseFeatures(self, response):
-        def buildXpath(i):
-            return './following-sibling::table \
-                    [1 = count(preceding-sibling::h4[1] | ../h4[%d])]' % (i + 1)
+    def parseOptions(self, response):
+        items = []
+        elements = response.xpath('//div[@id="options-pod"]//h3')
+        for i in range(0, len(elements)):
+            item = KeyValueItem()
+            item['key'] = elements[i].xpath('text()').extract()[0]
+            item['value'] = self.parseTable(elements[i].xpath(self.buildXpath('h3', i)))
 
+            items.append(item)
+
+        return items
+
+    def parseFeatures(self, response):
         def parseH4(id):
             elements = response.xpath('//div[@id="%s"]//h4' % id)
             h4s = []
             for i in range(0, len(elements)):
                 item = KeyValueItem()
                 item['key'] = elements[i].xpath('text()').extract()[0]
-                item['value'] = self.parseTable(elements[i].xpath(buildXpath(i)))
+                item['value'] = self.parseTable(elements[i].xpath(self.buildXpath('h4', i)))
 
                 h4s.append(item)
             return h4s
@@ -67,16 +76,13 @@ class CarSpider(scrapy.Spider):
         return items
 
     def parseSpecifications(self, response):
-        def buildXpath(i):
-            return './following-sibling::table \
-                    [1 = count(preceding-sibling::h3[1] | ../h3[%d])]' % (i + 1)
 
         specs = []
         elements = response.xpath('//div[@id="specification-pod"]//h3')
         for i in range(0, len(elements)):
             item = KeyValueItem()
             item['key'] = elements[i].xpath('text()').extract()[0]
-            item['value'] = self.parseTable(elements[i].xpath(buildXpath(i)))
+            item['value'] = self.parseTable(elements[i].xpath(self.buildXpath('h4', i)))
 
             specs.append(item)
 
@@ -126,3 +132,7 @@ class CarSpider(scrapy.Spider):
             items.append(item)
 
         return items
+
+    def buildXpath(self, name, i):
+        return './following-sibling::table \
+                [1 = count(preceding-sibling::%s[1] | ../%s[%d])]' % (name, name, (i + 1))

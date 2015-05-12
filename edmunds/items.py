@@ -15,6 +15,7 @@ class EdmundsItem(scrapy.Item):
     colors = scrapy.Field()
     specifications = scrapy.Field()
     features = scrapy.Field()
+    options = scrapy.Field()
 
 class KeyValueItem(scrapy.Item):
     key = scrapy.Field()
