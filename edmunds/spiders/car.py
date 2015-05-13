@@ -135,7 +135,11 @@ class CarSpider(scrapy.Spider):
         for e in elements:
             item = KeyValueItem()
             item['key'] = e.xpath('span/text()').extract()[0]
-            item['value'] = e.xpath('em/text()').extract()[0]
+            rating = e.xpath('em/span[@class="rating-big"]')
+            if rating:
+                item['value'] = rating.xpath('@title').extract()[0]
+            else:
+                item['value'] = e.xpath('em/text()').extract()[0]
             items.append(item)
 
         return items
