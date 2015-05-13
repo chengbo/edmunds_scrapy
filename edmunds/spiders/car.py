@@ -7,9 +7,9 @@ from edmunds.items import KeyValueItem, EdmundsItem, ColorItem
 class CarSpider(scrapy.Spider):
     name = "car"
     allowed_domains = ["www.edmunds.com"]
-    start_urls = (
-        'http://www.edmunds.com/bmw/m6-gran-coupe/2015/st-200695680/features-specs/',
-    )
+    f = open('urls.txt')
+    start_urls = [url.strip() for url in f.readlines()]
+    f.close()
 
     def parse(self, response):
         item = EdmundsItem()
