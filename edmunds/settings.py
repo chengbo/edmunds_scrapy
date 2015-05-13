@@ -13,5 +13,11 @@ BOT_NAME = 'edmunds'
 SPIDER_MODULES = ['edmunds.spiders']
 NEWSPIDER_MODULE = 'edmunds.spiders'
 
+DOWNLOAD_DELAY = 2
+
+ITEM_PIPELINES = {
+    'edmunds.pipelines.EdmundsPipeline': 500
+}
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'edmunds (+http://www.yourdomain.com)'
